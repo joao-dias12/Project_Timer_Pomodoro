@@ -25,7 +25,8 @@ export const FormContainer = styled.div`
   font-weight: bold;
   flex-wrap: wrap;
 `
-const BaseInput = styled.input`
+// Criando componente base para adicionar a outros componentes estilizados
+const BaseInput = styled.input` 
   background: transparent;
   height: 2.5rem;
   border: 0;
@@ -35,16 +36,16 @@ const BaseInput = styled.input`
   padding: 0 0.5rem;
   color: ${(props) => props.theme['gray-100']};
   &:focus {
-    box-shadow: none;
+    box-shadow: none; // sem borda quando você da um foco
     border-color: ${(props) => props.theme['green-500']};
   }
   &::placeholder {
     color: ${(props) => props.theme['gray-500']};
   }
 `
-
+// O base input agora está sendo usado em ambos componentes Task Input e MinutesAmountInput
 export const TaskInput = styled(BaseInput)`
-  flex: 1;
+  flex: 1; // Esse elemento pode aumentar , pode diminuir , pode fazer varias coisas !
 `
 
 export const MinutesAmountInput = styled(BaseInput)`
