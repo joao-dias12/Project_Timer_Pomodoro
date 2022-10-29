@@ -52,3 +52,30 @@ export const HistoryList = styled.div`
     }
   }
 `
+const STATUS_COLORS = {
+  // criando um objeto para armazenar as cores
+  yellow: 'yellow-500',
+  green: 'green-500',
+  red: 'red-500',
+} as const // declarando que sempre será esses valores
+
+interface StatusProps {
+  statusColor: keyof typeof STATUS_COLORS // Cores disponiveis são as keys dos tipos do STATUS_COLORS
+}
+
+export const Status = styled.span<StatusProps>`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  &::before {
+    // Adicionando alguma coisa logo antes do item em si
+    content: ''; // para ser um objeto é preciso declarar um conteúdo em branco
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px; // Bola totalmente arredondada
+    background: ${(props) =>
+      props.theme[
+        STATUS_COLORS[props.statusColor]
+      ]}; // propiedade "satuscolor" terá que ser declarada quando usa-se-se essa componente
+  }
+`
