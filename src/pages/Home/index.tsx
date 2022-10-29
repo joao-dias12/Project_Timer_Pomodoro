@@ -23,7 +23,7 @@ export function Home() {
           />
 
           {/* // lista de opções de task, sugestões, como se fosse um campo Choices */}
-          <datalist id="task-suggestions"> 
+          <datalist id="task-suggestions">
             <option value="Projeto 1" />
             <option value="Projeto 2" />
             <option value="Projeto 3" />
