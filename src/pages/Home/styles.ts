@@ -46,6 +46,9 @@ const BaseInput = styled.input`
 // O base input agora está sendo usado em ambos componentes Task Input e MinutesAmountInput
 export const TaskInput = styled(BaseInput)`
   flex: 1; // Esse elemento pode aumentar , pode diminuir , pode fazer varias coisas !
+  &::-webkit-calendar-picker-indicator {
+    display: none !important; // tirando a seta de seleção
+  }
 `
 
 export const MinutesAmountInput = styled(BaseInput)`
