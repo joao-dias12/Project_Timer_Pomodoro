@@ -1,5 +1,8 @@
 import { Play } from 'phosphor-react'
 import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as zod from 'zod' // sintax de importação para bibliotecas sem export default
+
 
 import {
   CountdownContainer,
@@ -14,8 +17,18 @@ import {
 // controlled(manter em tempo real o estado, valor atualizado do estado) - usando "Onchange", usado para formulatios simples
 // uncontrolled
 
+const newCycleFormValidationSchema = zod.object({
+  task: zod.string().min(1, 'Informe a tarefa'), // o objeto "task" deve ter no minimo 1 caracter, caso não digite, vai ter uma mensagem"informe uma tarefa
+  minutesAmount: zod
+    .number()
+    .min(5, 'O ciclo precisa ser de no mínimo 5 minutos.')
+    .max(60, 'O ciclo precisa ser de no máximo 60 minutos.'), // minutesAmount é um numero de valor minimo 5 e maximo 60. mensagem de validação ao lado
+})
+//
 export function Home() {
-  const { register, handleSubmit, watch } = useForm() // useForm retorna um objeto com varias funções e variaveis.
+  const { register, handleSubmit, watch } = useForm({
+    resolver: zodResolver(newCycleFormValidationSchema),
+  }) // useForm retorna um objeto com varias funções e variaveis.
   // register vai adicionar um input ao formulário. register recebe o nome do input e retorna metodos para trabalhar com inputs. ex: Onchange, onFocus, etc.
   // handleSubmit vai gatilhar quando o formula´rio for submetido
   // watch vai monitorar o campo "task"
