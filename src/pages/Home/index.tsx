@@ -1,4 +1,5 @@
 import { Play } from 'phosphor-react'
+import { useState } from 'react'
 
 import {
   CountdownContainer,
@@ -10,7 +11,11 @@ import {
   TaskInput,
 } from './styles'
 
+// controlled(manter em tempo real o estado, valor atualizado do estado) - usando "Onchange" / uncontrolled
+
 export function Home() {
+  const [task, setTask] = useState('')
+
   return (
     <HomeContainer>
       <form>
@@ -18,8 +23,11 @@ export function Home() {
           <label htmlFor="task">Vou trabalhar em</label>
           <TaskInput
             id="task"
+            name="task"
             list="task-suggestions"
             placeholder="Dê um nome para o seu projeto"
+            onChange={(e) => setTask(e.target.value)}
+            value={task}
           />
 
           {/* // lista de opções de task, sugestões, como se fosse um campo Choices */}
@@ -51,7 +59,7 @@ export function Home() {
           <span>0</span>
         </CountdownContainer>
 
-        <StartCountdownButton disabled type="submit">
+        <StartCountdownButton disabled={!task} type="submit"> {/*desabilitando quando a task está vazia*/}
           <Play size={24} />
           Começar
         </StartCountdownButton>
