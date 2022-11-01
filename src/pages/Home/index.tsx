@@ -2,7 +2,7 @@ import { Play } from 'phosphor-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as zod from 'zod' // sintax de importação para bibliotecas sem export default
-
+import { useState } from 'react'
 
 import {
   CountdownContainer,
@@ -24,18 +24,57 @@ const newCycleFormValidationSchema = zod.object({
     .min(5, 'O ciclo precisa ser de no mínimo 5 minutos.')
     .max(60, 'O ciclo precisa ser de no máximo 60 minutos.'), // minutesAmount é um numero de valor minimo 5 e maximo 60. mensagem de validação ao lado
 })
-//
+
+type NewCycleFormData = zod.infer<typeof newCycleFormValidationSchema>
+
+interface Cycle {
+  id: string
+  task: string
+  minutesAmount: number
+}
+
 export function Home() {
-  const { register, handleSubmit, watch } = useForm({
+  const [cycles, setCycles] = useState<Cycle[]>([]) // estado para armazenar uma lista de ciclos, ou seja um objeto que tem typagem compativel a interface(cycle)
+  const [activeCycleId, setActiveCycleId] = useState<string | null>(null) // criando estado para armazenar ciclo ativo. como começa sem nenhum ciclo, o estado incial é null mas a typagme é string ou null
+  const [amountSecondsPassed, setAmountSecondsPassed] = useState(0) // state para armazenar os segundos passando
+  const { register, handleSubmit, watch, reset } = useForm<NewCycleFormData>({
     resolver: zodResolver(newCycleFormValidationSchema),
+    defaultValues: {
+      task: '',
+      minutesAmount: 0,
+    },
   }) // useForm retorna um objeto com varias funções e variaveis.
   // register vai adicionar um input ao formulário. register recebe o nome do input e retorna metodos para trabalhar com inputs. ex: Onchange, onFocus, etc.
   // handleSubmit vai gatilhar quando o formula´rio for submetido
   // watch vai monitorar o campo "task"
+  // defaultValues dá o valor inicial de cada campo
 
-  function handleCreateNewCycle(data: any) {
-    console.log(data)
+  function handleCreateNewCycle(data: NewCycleFormData) {
+    const id = String(new Date().getTime()) // Criando uma id para a aplicação
+
+    const newCycle: Cycle = {
+      id,
+      task: data.task,
+      minutesAmount: data.minutesAmount,
+    }
+
+    setCycles((state) => [...state, newCycle])
+    setActiveCycleId(id) // Como a gente não usa o spread, o estado setado é apenas o ciclo setado
+
+    reset()
+    // limpa os valores depois do gatilho. mas para isso é necessario criar o "defaultValues"!
   }
+
+  const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
+
+  const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0 // se eu tiver um ciclo ativo, essa variavel vai ser o minutesamount vezes 60, se não (:) ela vai ser igual a 0
+  const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0
+
+  const minutesAmount = Math.floor(currentSeconds / 60) // arredondando para baixo usando o "floor"
+  const secondsAmount = currentSeconds % 60 // resto da divisão para pegar os segundos.
+
+  const minutes = String(minutesAmount).padStart(2, '0') // Se a variavel tiver dois caracteres, mantém, caso tenha apenas 1, colocar o '0' no começo
+  const seconds = String(secondsAmount).padStart(2, '0')
 
   const task = watch('task')
   const isSubmitDisable = !task // Vai estar desabilitado quando o campo "task" estiver vazio
@@ -75,11 +114,11 @@ export function Home() {
         </FormContainer>
 
         <CountdownContainer>
-          <span>0</span>
-          <span>0</span>
+          <span>{minutes[0]}</span>
+          <span>{minutes[1]}</span>
           <Separator>:</Separator>
-          <span>0</span>
-          <span>0</span>
+          <span>{seconds[0]}</span>
+          <span>{seconds[1]}</span>
         </CountdownContainer>
 
         <StartCountdownButton disabled={isSubmitDisable} type="submit">
