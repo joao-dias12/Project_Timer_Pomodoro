@@ -2,7 +2,8 @@ import { Play } from 'phosphor-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as zod from 'zod' // sintax de importação para bibliotecas sem export default
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { differenceInSeconds } from 'date-fns'
 
 import {
   CountdownContainer,
@@ -31,6 +32,7 @@ interface Cycle {
   id: string
   task: string
   minutesAmount: number
+  startDate: Date // Data que o timer ficou ativo
 }
 
 export function Home() {
@@ -49,6 +51,18 @@ export function Home() {
   // watch vai monitorar o campo "task"
   // defaultValues dá o valor inicial de cada campo
 
+  const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
+
+  useEffect(() => {
+    if (activeCycle) {
+      setInterval(() => {
+        setAmountSecondsPassed(
+          differenceInSeconds(new Date(), activeCycle.startDate),
+        )
+      }, 1000)
+    }
+  }, [activeCycle]) // Se eu tiver um ciclo ativo. vamos setar o quando de segundos que passaram sendo a diferença entre a data do inicio do ciclo com a data atual.
+
   function handleCreateNewCycle(data: NewCycleFormData) {
     const id = String(new Date().getTime()) // Criando uma id para a aplicação
 
@@ -56,6 +70,7 @@ export function Home() {
       id,
       task: data.task,
       minutesAmount: data.minutesAmount,
+      startDate: new Date(), // A data que o ciclo iniciou
     }
 
     setCycles((state) => [...state, newCycle])
@@ -64,8 +79,6 @@ export function Home() {
     reset()
     // limpa os valores depois do gatilho. mas para isso é necessario criar o "defaultValues"!
   }
-
-  const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
 
   const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0 // se eu tiver um ciclo ativo, essa variavel vai ser o minutesamount vezes 60, se não (:) ela vai ser igual a 0
   const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0
