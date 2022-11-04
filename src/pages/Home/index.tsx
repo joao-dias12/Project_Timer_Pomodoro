@@ -54,12 +54,17 @@ export function Home() {
   const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
 
   useEffect(() => {
+    let interval: number
+
     if (activeCycle) {
-      setInterval(() => {
+      interval = setInterval(() => {
         setAmountSecondsPassed(
           differenceInSeconds(new Date(), activeCycle.startDate),
         )
       }, 1000)
+    }
+    return () => { // retorno de um useEffect é sempre uma função.
+      clearInterval(interval) // limpando os intervalos anteriores e mantendo só a contagem.
     }
   }, [activeCycle]) // Se eu tiver um ciclo ativo. vamos setar o quando de segundos que passaram sendo a diferença entre a data do inicio do ciclo com a data atual.
 
