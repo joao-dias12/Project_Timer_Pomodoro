@@ -35,6 +35,7 @@ interface Cycle {
   minutesAmount: number
   startDate: Date // Data que o timer ficou ativo
   interruptedDate?: Date // Vai ser para armazenar as tasks que foram interrompidas
+  finishedDate?: Date // data em que o ciclo foi finalizado
 }
 
 export function Home() {
@@ -55,21 +56,41 @@ export function Home() {
 
   const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
 
+  const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0
+
   useEffect(() => {
     let interval: number
 
     if (activeCycle) {
       interval = setInterval(() => {
-        setAmountSecondsPassed(
-          differenceInSeconds(new Date(), activeCycle.startDate),
+        const secondsDifference = differenceInSeconds(
+          new Date(),
+          activeCycle.startDate,
         )
+
+        if (secondsDifference >= totalSeconds) {
+          setCycles((state) =>
+            state.map((cycle) => {
+              if (cycle.id === activeCycleId) {
+                return { ...cycle, finishedDate: new Date() }
+              } else {
+                return cycle
+              }
+            }),
+          )
+
+          setAmountSecondsPassed(totalSeconds)
+          clearInterval(interval)
+        } else {
+          setAmountSecondsPassed(secondsDifference)
+        }
       }, 1000)
     }
     return () => {
       // retorno de um useEffect é sempre uma função.
       clearInterval(interval) // limpando os intervalos anteriores e mantendo só a contagem.
     }
-  }, [activeCycle]) // Se eu tiver um ciclo ativo. vamos setar o quando de segundos que passaram sendo a diferença entre a data do inicio do ciclo com a data atual.
+  }, [activeCycle, totalSeconds, activeCycleId]) // Se eu tiver um ciclo ativo. vamos setar o quando de segundos que passaram sendo a diferença entre a data do inicio do ciclo com a data atual.
 
   function handleCreateNewCycle(data: NewCycleFormData) {
     const id = String(new Date().getTime()) // Criando uma id para a aplicação
@@ -90,8 +111,8 @@ export function Home() {
   }
 
   function handleInterruptCycle() {
-    setCycles(
-      cycles.map((cycle) => {
+    setCycles((state) =>
+      state.map((cycle) => {
         if (cycle.id === activeCycleId) {
           return { ...cycle, interruptedDate: new Date() } // Registrando a data em que o ciclo foi interrompido
         } else {
@@ -102,7 +123,6 @@ export function Home() {
     setActiveCycleId(null)
   }
 
-  const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0 // se eu tiver um ciclo ativo, essa variavel vai ser o minutesamount vezes 60, se não (:) ela vai ser igual a 0
   const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0
 
   const minutesAmount = Math.floor(currentSeconds / 60) // arredondando para baixo usando o "floor"
@@ -121,7 +141,6 @@ export function Home() {
   const task = watch('task')
   const isSubmitDisable = !task // Vai estar desabilitado quando o campo "task" estiver vazio
 
-  console.log(cycles)
 
   return (
     <HomeContainer>
