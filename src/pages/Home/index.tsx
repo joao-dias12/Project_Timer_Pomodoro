@@ -80,6 +80,7 @@ export function Home() {
 
     setCycles((state) => [...state, newCycle])
     setActiveCycleId(id) // Como a gente não usa o spread, o estado setado é apenas o ciclo setado
+    setAmountSecondsPassed(0) // resetando quantos segundos se passaram
 
     reset()
     // limpa os valores depois do gatilho. mas para isso é necessario criar o "defaultValues"!
