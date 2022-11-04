@@ -94,6 +94,12 @@ export function Home() {
   const minutes = String(minutesAmount).padStart(2, '0') // Se a variavel tiver dois caracteres, mantém, caso tenha apenas 1, colocar o '0' no começo
   const seconds = String(secondsAmount).padStart(2, '0')
 
+  useEffect(() => {
+    if (activeCycle) { // a contagem só começa se existir algum ciclo
+      document.title = `${minutes}:${seconds}`
+    }
+  }, [minutes, seconds, activeCycle]) // Mexendo no title para ele acompnhar a contagem
+
   const task = watch('task')
   const isSubmitDisable = !task // Vai estar desabilitado quando o campo "task" estiver vazio
 
