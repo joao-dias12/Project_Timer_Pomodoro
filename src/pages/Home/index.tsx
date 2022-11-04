@@ -1,4 +1,4 @@
-import { Play } from 'phosphor-react'
+import { HandPalm, Play } from 'phosphor-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as zod from 'zod' // sintax de importação para bibliotecas sem export default
@@ -13,6 +13,7 @@ import {
   Separator,
   StartCountdownButton,
   TaskInput,
+  StopCountdownButton,
 } from './styles'
 
 // controlled(manter em tempo real o estado, valor atualizado do estado) - usando "Onchange", usado para formulatios simples
@@ -33,6 +34,7 @@ interface Cycle {
   task: string
   minutesAmount: number
   startDate: Date // Data que o timer ficou ativo
+  interruptedDate?: Date // Vai ser para armazenar as tasks que foram interrompidas
 }
 
 export function Home() {
@@ -63,7 +65,8 @@ export function Home() {
         )
       }, 1000)
     }
-    return () => { // retorno de um useEffect é sempre uma função.
+    return () => {
+      // retorno de um useEffect é sempre uma função.
       clearInterval(interval) // limpando os intervalos anteriores e mantendo só a contagem.
     }
   }, [activeCycle]) // Se eu tiver um ciclo ativo. vamos setar o quando de segundos que passaram sendo a diferença entre a data do inicio do ciclo com a data atual.
@@ -86,6 +89,19 @@ export function Home() {
     // limpa os valores depois do gatilho. mas para isso é necessario criar o "defaultValues"!
   }
 
+  function handleInterruptCycle() {
+    setCycles(
+      cycles.map((cycle) => {
+        if (cycle.id === activeCycleId) {
+          return { ...cycle, interruptedDate: new Date() } // Registrando a data em que o ciclo foi interrompido
+        } else {
+          return cycle
+        }
+      }),
+    )
+    setActiveCycleId(null)
+  }
+
   const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0 // se eu tiver um ciclo ativo, essa variavel vai ser o minutesamount vezes 60, se não (:) ela vai ser igual a 0
   const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0
 
@@ -96,13 +112,16 @@ export function Home() {
   const seconds = String(secondsAmount).padStart(2, '0')
 
   useEffect(() => {
-    if (activeCycle) { // a contagem só começa se existir algum ciclo
+    if (activeCycle) {
+      // a contagem só começa se existir algum ciclo
       document.title = `${minutes}:${seconds}`
     }
   }, [minutes, seconds, activeCycle]) // Mexendo no title para ele acompnhar a contagem
 
   const task = watch('task')
   const isSubmitDisable = !task // Vai estar desabilitado quando o campo "task" estiver vazio
+
+  console.log(cycles)
 
   return (
     <HomeContainer>
@@ -113,6 +132,7 @@ export function Home() {
             id="task"
             list="task-suggestions"
             placeholder="Dê um nome para o seu projeto"
+            disabled={!!activeCycle} // dasabilitando o formulário caso esteja alguma ciclo ativo. a exclamação converte para boolean.
             {...register('task')} // spreadoperator devolver os atributos que o o "register" já traz como herança. Tudo que o register já tem dentro dele
             // lista de opções de task, sugestões, como se fosse um campo Choices. A função recebe um nome, esse nome é o "name" do input criado pela própia "register"
           />
@@ -146,10 +166,19 @@ export function Home() {
           <span>{seconds[1]}</span>
         </CountdownContainer>
 
-        <StartCountdownButton disabled={isSubmitDisable} type="submit">
-          <Play size={24} />
-          Começar
-        </StartCountdownButton>
+        {activeCycle ? ( // se eu tiver o ciclo ja rolando eu vou fazer algo
+          <StopCountdownButton onClick={handleInterruptCycle} type="button"> {/* Chamando o handleinterrupt quando clicar   */}
+            <HandPalm size={24} />
+            Interromper
+          </StopCountdownButton>
+        ) : ( // se não, eu vou fazer a coisa aqui de baixo
+          <StartCountdownButton disabled={isSubmitDisable} type="submit">
+            {' '}
+            {/* estado se o ciclo não tiver começado */}
+            <Play size={24} />
+            Começar
+          </StartCountdownButton>
+        )}
       </form>
     </HomeContainer>
   )
