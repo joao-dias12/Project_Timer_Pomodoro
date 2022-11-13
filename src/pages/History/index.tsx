@@ -38,7 +38,7 @@ export function History() {
                       <Status statusColor="red">Interrompido</Status>
                     )}
 
-                    {!cycle.finishedDate && !cycle.interruptedDate && (
+                    {!cycle.finishedDate && !cycle.interruptedDate && ( // Componente só aparece se isso for verdade
                       <Status statusColor="yellow">Em andamento</Status>
                     )}
                   </td>
