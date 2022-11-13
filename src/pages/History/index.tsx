@@ -3,7 +3,6 @@ import { CyclesContext } from '../../contexts/CyclesContext'
 import { HistoryContainer, HistoryList, Status } from './styles'
 
 export function History() {
-
   const { cycles } = useContext(CyclesContext)
   return (
     <HistoryContainer>
@@ -23,7 +22,7 @@ export function History() {
             </tr>
           </thead>
           <tbody>
-          {cycles.map((cycle) => {
+            {cycles.map((cycle) => {
               return (
                 <tr key={cycle.id}>
                   <td>{cycle.task}</td>
@@ -38,9 +37,10 @@ export function History() {
                       <Status statusColor="red">Interrompido</Status>
                     )}
 
-                    {!cycle.finishedDate && !cycle.interruptedDate && ( // Componente só aparece se isso for verdade
-                      <Status statusColor="yellow">Em andamento</Status>
-                    )}
+                    {!cycle.finishedDate &&
+                      !cycle.interruptedDate && ( // Componente só aparece se isso for verdade
+                        <Status statusColor="yellow">Em andamento</Status>
+                      )}
                   </td>
                 </tr>
               )
