@@ -6,7 +6,6 @@ interface CreateCycleData {
   minutesAmount: number
 }
 
-
 interface CyclesContextType {
   cycles: Cycle[]
   activeCycle: Cycle | undefined
@@ -23,7 +22,6 @@ export const CyclesContext = createContext({} as CyclesContextType)
 interface CyclesContextProviderProps {
   children: ReactNode
 }
-
 
 export function CyclesContextProvider({
   children,
